@@ -1,0 +1,96 @@
+ZPhisher - Blockchain Social Engineering Detection Demo
+CMP-6013Y Final Year Project
+Azeem Abdul-Rahim | Registration: 100428101
+Supervisor: Dr. Rameez Asif
+University of East Anglia, 2025-2026
+========================================================
+
+QUICK START (Lab PC)
+--------------------
+1. Plug in USB stick
+2. Double-click START_DEMO.bat
+3. Wait ~60 seconds for models to load
+4. Browser opens automatically at http://localhost:5000
+5. Green dot in top-left = all 3 models ready
+
+WHAT THE DEMO SHOWS
+--------------------
+ZPhisher is a real-time social engineering detection system
+that classifies blockchain communications using THREE models:
+
+  - TF-IDF + Logistic Regression (baseline)
+  - DistilBERT fine-tuned on general email data
+  - DistilBERT domain-adapted on blockchain communications
+
+The live feed streams pre-loaded blockchain messages through
+all three models simultaneously, showing confidence scores
+and model agreement/disagreement in real time.
+
+The manual input box accepts any text and classifies it
+through all three models instantly (Ctrl+Enter to submit).
+
+HINT PILLS
+----------
+Click the coloured pills above the input box to load
+pre-written examples covering different attack types:
+  - Fake airdrop        - Seed phrase scam
+  - Founder impersonation  - Legitimate transaction
+  - Legitimate staking  - Borderline HR scam
+
+KEY FINDINGS TO DISCUSS
+------------------------
+General F1 (email test set):
+  TF-IDF baseline:     0.9789
+  DistilBERT general:  0.9900
+
+Blockchain F1 (blockchain eval set):
+  TF-IDF baseline:     0.6757  <- domain gap
+  DistilBERT general:  0.6667  <- domain gap
+  DistilBERT adapted:  1.0000  <- domain adaptation works
+
+The domain gap (0.99 -> 0.67) is the central research finding.
+The adapted model (1.0) demonstrates this gap is addressable.
+
+FOLDER STRUCTURE
+----------------
+ZPhisher/
+├── START_DEMO.bat           <- run this to start
+├── app.py                   <- Flask backend (3 models)
+├── demo.html                <- dashboard frontend
+├── model_checkpoint/        <- general DistilBERT weights
+├── model_checkpoint_adapted/ <- blockchain-adapted weights
+├── data/
+│   └── processed/
+│       └── train.csv        <- training data for TF-IDF
+├── server.log               <- created at runtime (ignore)
+└── README.txt               <- this file
+
+REQUIREMENTS
+------------
+- Windows 10/11 (64-bit)
+- Python 3.9+ installed (lab PCs should have this)
+- Internet connection (first run only, to install packages)
+- ~4GB free RAM
+- Modern browser (Chrome/Edge/Firefox)
+
+If Python is not installed on the lab PC, contact your
+supervisor in advance to arrange a suitable machine.
+
+STOPPING THE DEMO
+-----------------
+Press any key in the black terminal window to stop the
+server cleanly when your inspection is complete.
+
+TROUBLESHOOTING
+---------------
+- Browser shows "Cannot reach server": wait 30 more seconds
+  for models to load, then refresh
+- Red dot in header: models still loading, wait
+- Green dot but feed not starting: click Resume Feed button
+- Port 5000 already in use: restart the batch file
+
+SOURCE CODE
+-----------
+Full source code, notebooks, and model checkpoints are
+available in the OneDrive submission repository.
+Contact: 100428101@uea.ac.uk
