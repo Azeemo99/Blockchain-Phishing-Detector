@@ -3,485 +3,297 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ZPhisher · Blockchain Social Engineering Monitor</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>CryptoGuard</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#080C12; --bg2:#0D1420; --bg3:#111927;
-  --border:#1E2D42; --border2:#253448;
-  --text:#C8D8EC; --text2:#6B8AAD; --text3:#3A5270;
-  --accent:#2E75B6; --accent2:#1A4F8A;
-  --safe:#1DB87A; --safe-bg:rgba(29,184,122,0.08); --safe-bd:rgba(29,184,122,0.25);
-  --warn:#F59E0B; --warn-bg:rgba(245,158,11,0.08); --warn-bd:rgba(245,158,11,0.25);
-  --danger:#EF4444; --danger-bg:rgba(239,68,68,0.08); --danger-bd:rgba(239,68,68,0.3);
-  --purple:#A855F7; --purple-bg:rgba(168,85,247,0.08); --purple-bd:rgba(168,85,247,0.3);
-  --mono:'JetBrains Mono',monospace; --sans:'Syne',sans-serif;
+  --bg:#F4F3EF; --bg2:#ECEAE4; --bg3:#E2E0D8;
+  --border:#C8C4B8; --border2:#D8D4CC;
+  --text:#1A1916; --text2:#5A5650; --text3:#8A8680;
+  --accent:#1B4F8C; --accent2:#153D6F;
+  --safe:#1A6B3C; --safe-bg:#EAF3EE; --safe-bd:#A8D4B8;
+  --danger:#8B1A1A; --danger-bg:#F5EAEA; --danger-bd:#D4A8A8;
+  --warn:#7A5200; --warn-bg:#F5F0E8; --warn-bd:#D4C4A0;
+  --mono:'Source Code Pro',monospace;
+  --sans:'Source Sans 3',sans-serif;
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(46,117,182,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(46,117,182,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
-.layout{position:relative;z-index:1;display:grid;grid-template-rows:56px 1fr;grid-template-columns:270px 1fr 310px;grid-template-areas:"header header header" "left main right";height:100vh;overflow:hidden;}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+body { background:var(--bg); color:var(--text); font-family:var(--sans); font-size:13px; height:100vh; overflow:hidden; }
 
-/* HEADER */
-header{grid-area:header;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--border);background:rgba(8,12,18,0.95);backdrop-filter:blur(12px);}
-.logo{display:flex;align-items:center;gap:10px;font-family:var(--sans);font-weight:800;font-size:18px;letter-spacing:-0.02em;color:#fff;}
-.logo-icon{width:28px;height:28px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;}
-.logo span{color:var(--accent);}
-.header-meta{display:flex;align-items:center;gap:14px;font-size:11px;color:var(--text2);}
-.status-dot{width:7px;height:7px;border-radius:50%;background:var(--warn);box-shadow:0 0 8px var(--warn);animation:pulse 1.5s ease-in-out infinite;}
-.status-dot.ready{background:var(--safe);box-shadow:0 0 8px var(--safe);}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-.header-tag{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:10px;color:var(--text2);letter-spacing:0.08em;}
-.model-status{font-size:11px;color:var(--warn);animation:pulse 1.5s ease-in-out infinite;}
-.model-status.ready{color:var(--safe);animation:none;}
+.layout { display:grid; grid-template-columns:260px 1fr; height:100vh; }
 
-/* LEFT PANEL */
-.left-panel{grid-area:left;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--bg2);}
-.panel-header{padding:14px 16px 12px;border-bottom:1px solid var(--border);font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--text2);text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;}
-.live-badge{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:var(--danger);padding:2px 6px;border-radius:3px;font-size:9px;letter-spacing:0.1em;animation:blink 1.4s step-end infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-bottom:1px solid var(--border);}
-.stat-cell{background:var(--bg2);padding:12px 14px 10px;}
-.stat-val{font-family:var(--sans);font-size:22px;font-weight:700;line-height:1;margin-bottom:3px;}
-.stat-val.green{color:var(--safe);} .stat-val.red{color:var(--danger);} .stat-val.blue{color:var(--accent);} .stat-val.yellow{color:var(--warn);}
-.stat-label{font-size:9px;color:var(--text3);letter-spacing:0.06em;}
+/* Left */
+.left { border-right:1px solid var(--border); background:var(--bg2); display:flex; flex-direction:column; overflow:hidden; }
+.cg-title { padding:14px 14px 12px; font-family:var(--sans); font-size:17px; font-weight:600; color:var(--text); border-bottom:1px solid var(--border); flex-shrink:0; }
+.cg-title span { color:var(--accent); }
+.perf { padding:12px 14px; overflow-y:auto; }
+.perf h4 { font-size:10px; font-weight:600; letter-spacing:0.08em; color:var(--text2); text-transform:uppercase; margin-bottom:10px; font-family:var(--mono); }
+.mblock { margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--border2); }
+.mblock:last-child { margin-bottom:0; padding-bottom:0; border-bottom:none; }
+.mname { font-size:10px; font-weight:600; font-family:var(--mono); margin-bottom:5px; padding:2px 5px; border-radius:2px; display:inline-block; color:var(--text); background:var(--bg3); border:1px solid var(--border); }
+.msub { font-size:9px; color:var(--text3); font-family:var(--mono); margin-bottom:4px; letter-spacing:0.04em; }
+.msubgap { margin-top:8px; }
+.mrow { display:flex; align-items:center; gap:6px; margin-bottom:4px; }
+.mlbl { font-size:10px; color:var(--text2); font-family:var(--mono); min-width:56px; }
+.mtrack { flex:1; height:3px; background:var(--border); border-radius:1px; overflow:hidden; }
+.mfill { height:100%; border-radius:1px; background:var(--text); }
+.mscore { font-size:10px; font-family:var(--mono); font-weight:600; min-width:36px; text-align:right; color:var(--text); }
 
-/* Model performance section */
-.model-perf{padding:12px 16px;border-bottom:1px solid var(--border);overflow-y:auto;}
-.model-perf h4{font-size:10px;letter-spacing:0.1em;color:var(--text2);text-transform:uppercase;margin-bottom:10px;}
-.model-section{margin-bottom:10px;}
-.model-section-title{font-size:10px;font-weight:600;margin-bottom:5px;padding:3px 6px;border-radius:3px;display:inline-block;}
-.model-section-title.tfidf{color:var(--warn);background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);}
-.model-section-title.bert{color:var(--accent);background:rgba(46,117,182,0.1);border:1px solid rgba(46,117,182,0.2);}
-.model-section-title.adapted{color:var(--purple);background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.2);}
-.metric-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
-.metric-name{font-size:10px;color:var(--text2);min-width:62px;}
-.metric-bar-wrap{flex:1;margin:0 6px;height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
-.metric-bar{height:100%;border-radius:2px;}
-.metric-bar.tfidf{background:var(--warn);}
-.metric-bar.bert{background:var(--accent);}
-.metric-bar.adapted{background:var(--purple);}
-.metric-val{font-size:10px;font-weight:600;min-width:36px;text-align:right;}
-.metric-val.tfidf{color:var(--warn);} .metric-val.bert{color:var(--accent);} .metric-val.adapted{color:var(--purple);}
+/* Main */
+.main { display:flex; flex-direction:column; overflow:hidden; }
+.feed-bar { padding:9px 14px 7px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; background:var(--bg2); flex-shrink:0; }
+.feed-bar-title { font-size:10px; font-weight:600; letter-spacing:0.08em; color:var(--text2); text-transform:uppercase; font-family:var(--mono); }
+.btns { display:flex; gap:6px; }
+.btn { background:var(--bg); border:1px solid var(--border); color:var(--text2); padding:3px 9px; border-radius:3px; font-family:var(--mono); font-size:10px; cursor:pointer; }
+.btn:hover { background:var(--bg3); }
+.btn.on { background:var(--accent); border-color:var(--accent); color:white; }
+.feed { flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:6px; scrollbar-width:thin; scrollbar-color:var(--border) transparent; }
 
-.legend{padding:12px 16px;margin-top:auto;}
-.legend h4{font-size:10px;letter-spacing:0.1em;color:var(--text2);text-transform:uppercase;margin-bottom:8px;}
-.legend-item{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:10px;color:var(--text2);}
-.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+/* Cards */
+.card { background:white; border:1px solid; border-left-width:3px; border-radius:4px; padding:10px 12px; flex-shrink:0; animation:fi 0.2s ease; }
+@keyframes fi { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+.card.ph { border-color:var(--danger-bd); border-left-color:var(--danger); background:var(--danger-bg); }
+.card.le { border-color:var(--safe-bd);   border-left-color:var(--safe);   background:var(--safe-bg); }
+.card.sp { border-color:var(--warn-bd);   border-left-color:var(--warn);   background:var(--warn-bg); }
+.ctop { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:5px; gap:8px; }
+.csrc { font-size:10px; color:var(--text3); font-family:var(--mono); }
+.cverd { font-size:10px; font-weight:600; padding:1px 7px; border-radius:2px; font-family:var(--mono); flex-shrink:0; }
+.cverd.ph { color:var(--danger); background:var(--danger-bg); border:1px solid var(--danger-bd); }
+.cverd.le { color:var(--safe);   background:var(--safe-bg);   border:1px solid var(--safe-bd); }
+.cverd.sp { color:var(--warn);   background:var(--warn-bg);   border:1px solid var(--warn-bd); }
+.ctext { font-size:12px; color:var(--text); line-height:1.4; margin-bottom:7px; }
+.cmodels { display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-bottom:5px; }
+.cm { border-radius:3px; padding:6px 8px; display:flex; flex-direction:column; gap:2px; }
+.cm.p { background:var(--danger-bg); border:1px solid var(--danger-bd); }
+.cm.l { background:var(--safe-bg);   border:1px solid var(--safe-bd); }
+.cmn { font-size:9px; font-family:var(--mono); font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--text2); }
+.cml { font-size:11px; font-weight:600; font-family:var(--mono); }
+.cml.p { color:var(--danger); }
+.cml.l { color:var(--safe); }
+.cmpc { font-size:10px; font-family:var(--mono); }
+.cmpc.p { color:var(--danger); }
+.cmpc.l { color:var(--safe); }
 
-/* MAIN PANEL */
-.main-panel{grid-area:main;display:flex;flex-direction:column;overflow:hidden;}
-.feed-header{padding:12px 20px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.feed-title{font-size:10px;font-weight:600;letter-spacing:0.1em;color:var(--text2);text-transform:uppercase;}
-.feed-controls{display:flex;gap:8px;}
-.btn{background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:5px 12px;border-radius:4px;font-family:var(--mono);font-size:11px;cursor:pointer;transition:all 0.15s;letter-spacing:0.04em;}
-.btn:hover{background:var(--border);color:var(--text);}
-.btn.active{background:var(--accent2);border-color:var(--accent);color:#fff;}
-.feed-list{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;}
+/* Loading */
+.loading { display:flex; align-items:center; justify-content:center; height:100%; flex-direction:column; gap:10px; color:var(--text2); font-size:12px; font-family:var(--mono); }
+.spinner { width:18px; height:18px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
 
-/* Message cards */
-.msg-card{border-radius:6px;padding:10px 12px;border:1px solid;animation:slideIn 0.3s ease;position:relative;overflow:hidden;}
-@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-.msg-card.safe{background:var(--safe-bg);border-color:var(--safe-bd);}
-.msg-card.danger{background:var(--danger-bg);border-color:var(--danger-bd);}
-.msg-card.warning{background:var(--warn-bg);border-color:var(--warn-bd);}
-.msg-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
-.msg-card.safe::before{background:var(--safe);}
-.msg-card.danger::before{background:var(--danger);}
-.msg-card.warning::before{background:var(--warn);}
-.msg-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;gap:8px;}
-.msg-source{font-size:10px;color:var(--text3);letter-spacing:0.06em;flex-shrink:0;}
-.msg-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:3px;letter-spacing:0.06em;flex-shrink:0;}
-.badge-safe{background:rgba(29,184,122,0.15);color:var(--safe);border:1px solid var(--safe-bd);}
-.badge-danger{background:rgba(239,68,68,0.15);color:var(--danger);border:1px solid var(--danger-bd);}
-.badge-warning{background:rgba(245,158,11,0.15);color:var(--warn);border:1px solid var(--warn-bd);}
-.msg-text{font-size:11px;color:var(--text);line-height:1.4;margin-bottom:7px;}
-
-/* Three-model comparison row */
-.model-compare{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:5px;}
-.model-result{background:rgba(0,0,0,0.2);border-radius:4px;padding:6px 8px;border:1px solid var(--border);}
-.model-result-title{font-size:9px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px;}
-.model-result-title.tfidf{color:var(--warn);}
-.model-result-title.bert{color:var(--accent);}
-.model-result-title.adapted{color:var(--purple);}
-.model-result-label{font-size:11px;font-weight:600;margin-bottom:2px;}
-.model-result-label.phishing{color:var(--danger);}
-.model-result-label.legit{color:var(--safe);}
-.model-result-conf{font-size:9px;color:var(--text3);display:flex;align-items:center;gap:4px;}
-.conf-mini{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
-.conf-mini-fill{height:100%;border-radius:2px;}
-.conf-mini-fill.danger{background:var(--danger);}
-.conf-mini-fill.safe{background:var(--safe);}
-.msg-footer{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);}
-.msg-attack{color:var(--text2);}
-
-.loading-overlay{display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:12px;color:var(--text3);font-size:12px;}
-.spinner{width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* INPUT SECTION */
-.input-section{border-top:1px solid var(--border);padding:12px 16px;background:var(--bg2);}
-.input-label{font-size:10px;letter-spacing:0.1em;color:var(--text2);text-transform:uppercase;margin-bottom:6px;}
-.input-row{display:flex;gap:8px;}
-textarea{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-family:var(--mono);font-size:12px;padding:7px 10px;resize:none;height:60px;outline:none;transition:border-color 0.15s;line-height:1.4;}
-textarea:focus{border-color:var(--accent);}
-textarea::placeholder{color:var(--text3);}
-.btn-classify{background:var(--accent);border:1px solid var(--accent);color:#fff;padding:0 14px;border-radius:4px;font-family:var(--mono);font-size:11px;cursor:pointer;transition:all 0.15s;white-space:nowrap;align-self:stretch;font-weight:600;min-width:90px;}
-.btn-classify:hover{background:#3A8FD0;}
-.btn-classify:disabled{background:var(--bg3);border-color:var(--border2);color:var(--text3);cursor:not-allowed;}
-.input-hint{margin-top:5px;font-size:10px;color:var(--text3);}
-.hint-pill{display:inline-block;background:var(--bg3);border:1px solid var(--border);border-radius:3px;padding:2px 6px;margin:2px 2px 2px 0;cursor:pointer;transition:all 0.15s;font-size:10px;color:var(--text2);}
-.hint-pill:hover{background:var(--border);color:var(--text);}
-
-/* RIGHT PANEL */
-.right-panel{grid-area:right;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--bg2);}
-.alert-list{flex:1;overflow-y:auto;padding:8px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;}
-.alert-item{padding:9px 11px;border-radius:5px;margin-bottom:6px;border:1px solid var(--danger-bd);background:var(--danger-bg);animation:slideIn 0.3s ease;}
-.alert-item.warn{border-color:var(--warn-bd);background:var(--warn-bg);}
-.alert-top{display:flex;justify-content:space-between;margin-bottom:3px;}
-.alert-type{font-size:10px;font-weight:600;color:var(--danger);letter-spacing:0.06em;text-transform:uppercase;}
-.alert-item.warn .alert-type{color:var(--warn);}
-.alert-time{font-size:10px;color:var(--text3);}
-.alert-msg{font-size:11px;color:var(--text2);line-height:1.3;margin-bottom:4px;}
-.alert-models{display:flex;gap:5px;flex-wrap:wrap;}
-.alert-model-tag{font-size:9px;padding:1px 5px;border-radius:3px;border:1px solid;}
-.tag-phish-t{color:var(--warn);border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.08);}
-.tag-phish-b{color:var(--accent);border-color:rgba(46,117,182,0.3);background:rgba(46,117,182,0.08);}
-.tag-phish-a{color:var(--purple);border-color:rgba(168,85,247,0.3);background:rgba(168,85,247,0.08);}
-.tag-safe-t,.tag-safe-b,.tag-safe-a{color:var(--text3);border-color:var(--border);background:transparent;}
-
-.context-section{border-top:1px solid var(--border);padding:12px 16px;}
-.context-section h4{font-size:10px;letter-spacing:0.1em;color:var(--text2);text-transform:uppercase;margin-bottom:8px;}
-.context-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px;}
-.context-row:last-child{border-bottom:none;}
-.context-key{color:var(--text3);}
-.context-val{color:var(--text);font-weight:600;}
-.context-val.red{color:var(--danger);} .context-val.green{color:var(--safe);} .context-val.yellow{color:var(--warn);} .context-val.purple{color:var(--purple);}
-
-::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+/* Input */
+.input-wrap { border-top:1px solid var(--border); padding:10px 14px; background:var(--bg2); flex-shrink:0; }
+.input-lbl { font-size:10px; font-weight:600; letter-spacing:0.08em; color:var(--text2); text-transform:uppercase; margin-bottom:6px; font-family:var(--mono); }
+.input-row { display:flex; gap:6px; }
+textarea { flex:1; background:white; border:1px solid var(--border); border-radius:3px; color:var(--text); font-family:var(--mono); font-size:12px; padding:7px 10px; resize:none; height:58px; outline:none; line-height:1.4; }
+textarea:focus { border-color:var(--accent); }
+textarea::placeholder { color:var(--text3); }
+.btn-run { background:var(--accent); border:1px solid var(--accent2); color:white; padding:0 14px; border-radius:3px; font-family:var(--mono); font-size:11px; cursor:pointer; align-self:stretch; font-weight:600; }
+.btn-run:hover { background:var(--accent2); }
+.btn-run:disabled { background:var(--bg3); border-color:var(--border); color:var(--text3); cursor:not-allowed; }
+.examples { margin-top:5px; font-size:10px; color:var(--text3); font-family:var(--mono); }
+.ex { display:inline-block; background:var(--bg); border:1px solid var(--border); border-radius:2px; padding:1px 6px; margin:2px 2px 0 0; cursor:pointer; font-size:10px; color:var(--text2); }
+.ex:hover { background:var(--bg3); }
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
 </style>
 </head>
 <body>
 <div class="layout">
 
-  <!-- HEADER -->
-  <header>
-    <div class="logo"><div class="logo-icon">⛓</div>Z<span>Phisher</span></div>
-    <div class="header-meta">
-      <div class="status-dot" id="status-dot"></div>
-      <span class="model-status" id="model-status-text">Loading models...</span>
-      <div class="header-tag">3-Model Comparison</div>
-      <div class="header-tag">CMP-6013Y · Azeem Abdul-Rahim</div>
-      <div class="header-tag" id="clock">--:--:--</div>
-    </div>
-  </header>
-
-  <!-- LEFT PANEL -->
-  <aside class="left-panel">
-    <div class="panel-header">System Status <span class="live-badge">LIVE</span></div>
-    <div class="stats-grid">
-      <div class="stat-cell"><div class="stat-val blue" id="stat-total">0</div><div class="stat-label">SCANNED</div></div>
-      <div class="stat-cell"><div class="stat-val red" id="stat-threats">0</div><div class="stat-label">THREATS</div></div>
-      <div class="stat-cell"><div class="stat-val green" id="stat-safe">0</div><div class="stat-label">LEGITIMATE</div></div>
-      <div class="stat-cell"><div class="stat-val yellow" id="stat-agree">0%</div><div class="stat-label">3-MODEL AGREEMENT</div></div>
-    </div>
-
-    <div class="model-perf">
-      <h4>Performance Comparison</h4>
-
-      <div class="model-section">
-        <div class="model-section-title tfidf">TF-IDF + LR · Baseline</div>
-        <div class="metric-row"><span class="metric-name">General F1</span><div class="metric-bar-wrap"><div class="metric-bar tfidf" style="width:97.9%"></div></div><span class="metric-val tfidf">0.9789</span></div>
-        <div class="metric-row"><span class="metric-name">Blockchain F1</span><div class="metric-bar-wrap"><div class="metric-bar tfidf" style="width:67.6%"></div></div><span class="metric-val tfidf">0.6757</span></div>
+  <aside class="left">
+    <div class="cg-title">Crypto<span>Guard</span></div>
+    <div class="perf">
+      <h4>Model Performance</h4>
+      <div class="mblock">
+        <div class="mname">TF-IDF + Logistic Regression</div>
+        <div class="msub">General email test set</div>
+        <div class="mrow"><span class="mlbl">Accuracy</span><div class="mtrack"><div class="mfill" style="width:97.9%"></div></div><span class="mscore">0.9788</span></div>
+        <div class="mrow"><span class="mlbl">Precision</span><div class="mtrack"><div class="mfill" style="width:97.1%"></div></div><span class="mscore">0.9705</span></div>
+        <div class="mrow"><span class="mlbl">Recall</span><div class="mtrack"><div class="mfill" style="width:98.8%"></div></div><span class="mscore">0.9875</span></div>
+        <div class="mrow"><span class="mlbl">F1</span><div class="mtrack"><div class="mfill" style="width:97.9%"></div></div><span class="mscore">0.9789</span></div>
+        <div class="msub msubgap">Blockchain eval set</div>
+        <div class="mrow"><span class="mlbl">Accuracy</span><div class="mtrack"><div class="mfill" style="width:51.2%"></div></div><span class="mscore">0.5123</span></div>
+        <div class="mrow"><span class="mlbl">Precision</span><div class="mtrack"><div class="mfill" style="width:50.6%"></div></div><span class="mscore">0.5063</span></div>
+        <div class="mrow"><span class="mlbl">Recall</span><div class="mtrack"><div class="mfill" style="width:98.8%"></div></div><span class="mscore">0.9877</span></div>
+        <div class="mrow"><span class="mlbl">F1</span><div class="mtrack"><div class="mfill" style="width:66.9%"></div></div><span class="mscore">0.6695</span></div>
       </div>
-
-      <div class="model-section">
-        <div class="model-section-title bert">DistilBERT · General</div>
-        <div class="metric-row"><span class="metric-name">General F1</span><div class="metric-bar-wrap"><div class="metric-bar bert" style="width:99%"></div></div><span class="metric-val bert">0.9900</span></div>
-        <div class="metric-row"><span class="metric-name">Blockchain F1</span><div class="metric-bar-wrap"><div class="metric-bar bert" style="width:66.7%"></div></div><span class="metric-val bert">0.6667</span></div>
+      <div class="mblock">
+        <div class="mname">DistilBERT (general)</div>
+        <div class="msub">General email test set</div>
+        <div class="mrow"><span class="mlbl">Accuracy</span><div class="mtrack"><div class="mfill" style="width:98.7%"></div></div><span class="mscore">0.9869</span></div>
+        <div class="mrow"><span class="mlbl">Precision</span><div class="mtrack"><div class="mfill" style="width:98.4%"></div></div><span class="mscore">0.9839</span></div>
+        <div class="mrow"><span class="mlbl">Recall</span><div class="mtrack"><div class="mfill" style="width:99%"></div></div><span class="mscore">0.9900</span></div>
+        <div class="mrow"><span class="mlbl">F1</span><div class="mtrack"><div class="mfill" style="width:98.7%"></div></div><span class="mscore">0.9869</span></div>
+        <div class="msub msubgap">Blockchain eval set</div>
+        <div class="mrow"><span class="mlbl">Accuracy</span><div class="mtrack"><div class="mfill" style="width:46.3%"></div></div><span class="mscore">0.4630</span></div>
+        <div class="mrow"><span class="mlbl">Precision</span><div class="mtrack"><div class="mfill" style="width:47.9%"></div></div><span class="mscore">0.4786</span></div>
+        <div class="mrow"><span class="mlbl">Recall</span><div class="mtrack"><div class="mfill" style="width:82.7%"></div></div><span class="mscore">0.8272</span></div>
+        <div class="mrow"><span class="mlbl">F1</span><div class="mtrack"><div class="mfill" style="width:60.6%"></div></div><span class="mscore">0.6063</span></div>
       </div>
-
-      <div class="model-section">
-        <div class="model-section-title adapted">DistilBERT · Domain-Adapted</div>
-        <div class="metric-row"><span class="metric-name">General F1</span><div class="metric-bar-wrap"><div class="metric-bar adapted" style="width:99%"></div></div><span class="metric-val adapted">0.9900*</span></div>
-        <div class="metric-row"><span class="metric-name">Blockchain F1</span><div class="metric-bar-wrap"><div class="metric-bar adapted" style="width:100%"></div></div><span class="metric-val adapted">1.0000</span></div>
+      <div class="mblock">
+        <div class="mname">DistilBERT (domain-adapted)</div>
+        <div class="msub">Blockchain test set (n=189)</div>
+        <div class="mrow"><span class="mlbl">Accuracy</span><div class="mtrack"><div class="mfill" style="width:95.7%"></div></div><span class="mscore">0.9568</span></div>
+        <div class="mrow"><span class="mlbl">Precision</span><div class="mtrack"><div class="mfill" style="width:94.1%"></div></div><span class="mscore">0.9405</span></div>
+        <div class="mrow"><span class="mlbl">Recall</span><div class="mtrack"><div class="mfill" style="width:97.5%"></div></div><span class="mscore">0.9753</span></div>
+        <div class="mrow"><span class="mlbl">F1</span><div class="mtrack"><div class="mfill" style="width:95.8%"></div></div><span class="mscore">0.9576</span></div>
       </div>
-      <div style="font-size:9px;color:var(--text3);margin-top:4px;">* General F1 not re-evaluated post-adaptation</div>
-    </div>
-
-    <div class="legend">
-      <h4>Model Key</h4>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--warn)"></div>TF-IDF + LR — keyword baseline</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>DistilBERT — general email training</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>DistilBERT — blockchain domain-adapted</div>
     </div>
   </aside>
 
-  <!-- MAIN PANEL -->
-  <main class="main-panel">
-    <div class="feed-header">
-      <span class="feed-title">Live Classification Feed · Three-Model Comparison</span>
-      <div class="feed-controls">
-        <button class="btn active" id="btn-feed" onclick="toggleFeed()">⏸ Pause Feed</button>
-        <button class="btn" onclick="clearFeed()">✕ Clear</button>
+  <main class="main">
+    <div class="feed-bar">
+      <span class="feed-bar-title">Classification Feed</span>
+      <div class="btns">
+        <button class="btn on" id="btn-feed" onclick="toggleFeed()">Pause</button>
+        <button class="btn" onclick="document.getElementById('feed').innerHTML=''">Clear</button>
       </div>
     </div>
 
-    <div class="feed-list" id="feed-list">
-      <div class="loading-overlay" id="feed-loading">
+    <div class="feed" id="feed">
+      <div class="loading" id="feed-loading">
         <div class="spinner"></div>
-        <span id="loading-msg">Loading all three models — please wait...</span>
+        <span id="loading-msg">Initialising models...</span>
       </div>
     </div>
 
-    <div class="input-section">
-      <div class="input-label">Manual Classification · Ctrl+Enter to run all three models</div>
+    <div class="input-wrap">
+      <div class="input-lbl">Manual input</div>
       <div class="input-row">
-        <textarea id="manual-input" placeholder="Type any blockchain communication to compare all three models simultaneously..."></textarea>
-        <button class="btn-classify" id="classify-btn" onclick="classifyManual()" disabled>CLASSIFY →</button>
+        <textarea id="input-box" placeholder="Enter a message to classify..."></textarea>
+        <button class="btn-run" id="run-btn" onclick="runManual()" disabled>Run</button>
       </div>
-      <div class="input-hint">
-        Try:
-        <span class="hint-pill" onclick="fillHint('airdrop')">Fake airdrop</span>
-        <span class="hint-pill" onclick="fillHint('seed')">Seed phrase scam</span>
-        <span class="hint-pill" onclick="fillHint('founder')">Founder impersonation</span>
-        <span class="hint-pill" onclick="fillHint('legit-tx')">Legit transaction</span>
-        <span class="hint-pill" onclick="fillHint('legit-stake')">Legit staking</span>
-        <span class="hint-pill" onclick="fillHint('borderline')">Borderline case</span>
+      <div class="examples">
+        Examples:
+        <span class="ex" onclick="fill('airdrop')">fake airdrop</span>
+        <span class="ex" onclick="fill('seed')">seed phrase scam</span>
+        <span class="ex" onclick="fill('founder')">founder impersonation</span>
+        <span class="ex" onclick="fill('legit-tx')">legitimate transaction</span>
+        <span class="ex" onclick="fill('legit-stake')">legitimate staking</span>
+        <span class="ex" onclick="fill('borderline')">borderline case</span>
       </div>
     </div>
   </main>
 
-  <!-- RIGHT PANEL -->
-  <aside class="right-panel">
-    <div class="panel-header">Threat Alerts</div>
-    <div class="alert-list" id="alert-list">
-      <div style="padding:20px 8px;color:var(--text3);font-size:11px;text-align:center">No threats detected yet.<br>Monitoring active...</div>
-    </div>
-    <div class="context-section">
-      <h4>Domain Gap Summary</h4>
-      <div class="context-row"><span class="context-key">Baseline blockchain F1</span><span class="context-val yellow">0.6757</span></div>
-      <div class="context-row"><span class="context-key">General BERT blockchain F1</span><span class="context-val yellow">0.6667</span></div>
-      <div class="context-row"><span class="context-key">Adapted BERT blockchain F1</span><span class="context-val purple">1.0000</span></div>
-      <div class="context-row"><span class="context-key">Domain gap (general)</span><span class="context-val red">−0.3233</span></div>
-      <div class="context-row"><span class="context-key">Domain gap (adapted)</span><span class="context-val green">0.0000</span></div>
-      <div class="context-row"><span class="context-key">Adaptation method</span><span class="context-val">T5 augmentation</span></div>
-      <div class="context-row"><span class="context-key">Seed examples</span><span class="context-val">50 → 237</span></div>
-    </div>
-  </aside>
 </div>
-
 <script>
-const API_BASE = window.location.origin;
+const API = window.location.origin;
 
-const FEED_MESSAGES = [
-  {text:"URGENT: Your MetaMask wallet has been flagged for suspicious activity. Verify your seed phrase at metamask-security-verify.com within 48 hours or your funds will be frozen.",source:"Telegram · Crypto Support"},
-  {text:"Your Binance order has been filled. You bought 0.05 BTC at a price of 43,250 USDT. Your updated portfolio balance is available in your account dashboard.",source:"Binance Notification"},
-  {text:"Congratulations! You have been selected to receive a free airdrop of 500 ETH. Claim your tokens at metamask-airdrop-claim.com within 24 hours or your allocation will be lost.",source:"Discord · ETH Community"},
-  {text:"Your Ethereum transaction 0x8f3b2a has been confirmed after 12 block confirmations. Gas used: 21,000. Transaction fee: 0.002 ETH.",source:"Etherscan Alert"},
-  {text:"This is Vitalik Buterin. I am distributing ETH to early Ethereum supporters as a thank you. Send 0.5 ETH and receive 5 ETH back within 10 minutes.",source:"Twitter DM"},
-  {text:"Your staking rewards of 0.0042 ETH have been added to your validator balance. Current estimated annual rate: 4.2%. Next reward in approximately 6.5 minutes.",source:"Lido Finance"},
-  {text:"IMPORTANT NOTICE from Trust Wallet Support: Your wallet requires mandatory security verification. Failure to verify within 24 hours will result in permanent suspension.",source:"Email · Inbox"},
-  {text:"Your DeFi position on Aave is healthy. Current health factor: 2.41. Liquidation would occur if ETH price drops below $1,840. Monitor at app.aave.com",source:"Aave Protocol"},
-  {text:"CZ Binance here. To celebrate Binance reaching 100M users I am giving back to the community. Send 0.1 to 10 BNB and I will send double back. This offer expires in 30 minutes.",source:"Telegram · BNB Channel"},
-  {text:"Uniswap governance proposal UIP-42 is now open for voting. As a UNI token holder you can cast your vote on the proposal at app.uniswap.org/vote",source:"Uniswap Governance"},
-  {text:"Hi, I am from Binance customer support. We noticed an issue with your account. Please share your API key and secret so we can resolve the withdrawal problem.",source:"Live Chat"},
-  {text:"Ledger Live 2.73.0 is now available. This update includes support for new coins and improved Bluetooth connectivity for Ledger Nano X devices.",source:"Ledger Update"},
-  {text:"We have been receiving complaints against your account. Please find attached PDF for your kind attention. Manager — Human Resources Division",source:"Email · Unknown"},
-  {text:"Your Coinbase recurring buy of $100 USD worth of Bitcoin has been completed. 0.00231 BTC has been added to your portfolio.",source:"Coinbase"},
-  {text:"Exclusive whitelist spot available for the most anticipated NFT drop of 2024. You have been personally selected. Mint at nft-exclusive-mint.com. Only 100 spots remain.",source:"Discord · NFT Alpha"},
+const FEED = [
+  {text:"URGENT: Your MetaMask wallet has been flagged for suspicious activity. Verify your seed phrase at metamask-security-verify.com within 48 hours or your funds will be frozen.",src:"Telegram · Crypto Support"},
+  {text:"Your Binance order has been filled. You bought 0.05 BTC at a price of 43,250 USDT. Your updated portfolio balance is available in your account dashboard.",src:"Binance Notification"},
+  {text:"Congratulations! You have been selected to receive a free airdrop of 500 ETH. Claim your tokens at metamask-airdrop-claim.com within 24 hours or your allocation will be lost.",src:"Discord · ETH Community"},
+  {text:"Your Ethereum transaction 0x8f3b2a has been confirmed after 12 block confirmations. Gas used: 21,000. Transaction fee: 0.002 ETH.",src:"Etherscan Alert"},
+  {text:"This is Vitalik Buterin. I am distributing ETH to early supporters as a thank you. Send 0.5 ETH and receive 5 ETH back within 10 minutes.",src:"Twitter DM"},
+  {text:"Your staking rewards of 0.0042 ETH have been added to your validator balance. Current estimated annual rate: 4.2%. Next reward in approximately 6.5 minutes.",src:"Lido Finance"},
+  {text:"IMPORTANT NOTICE from Trust Wallet Support: Your wallet requires mandatory security verification. Failure to verify within 24 hours will result in permanent suspension.",src:"Email"},
+  {text:"Your DeFi position on Aave is healthy. Current health factor: 2.41. Liquidation would occur if ETH price drops below $1,840.",src:"Aave Protocol"},
+  {text:"CZ Binance here. To celebrate Binance reaching 100M users I am giving back to the community. Send 0.1 to 10 BNB and I will send double back. Expires in 30 minutes.",src:"Telegram"},
+  {text:"Uniswap governance proposal UIP-42 is now open for voting. As a UNI token holder you can cast your vote on the proposal at app.uniswap.org/vote",src:"Uniswap Governance"},
+  {text:"Hi, I am from Binance customer support. We noticed an issue with your account. Please share your API key and secret so we can resolve the withdrawal problem.",src:"Live Chat"},
+  {text:"Ledger Live 2.73.0 is now available. This update includes support for new coins and improved Bluetooth connectivity for Ledger Nano X devices.",src:"Ledger Update"},
+  {text:"We have been receiving complaints against your account. Please find attached PDF for your kind attention. Manager, Human Resources Division.",src:"Email"},
+  {text:"Your Coinbase recurring buy of $100 USD worth of Bitcoin has been completed. 0.00231 BTC has been added to your portfolio.",src:"Coinbase"},
+  {text:"Exclusive whitelist spot available for the most anticipated NFT drop of 2024. You have been personally selected. Mint at nft-exclusive-mint.com. Only 100 spots remain.",src:"Discord"},
 ];
 
-const HINTS = {
-  'airdrop':"Congratulations! You have been selected to receive a free airdrop of 500 ETH. To claim your tokens, connect your wallet at metamask-airdrop-claim.com and approve the transaction within 24 hours or your allocation will be lost.",
-  'seed':"URGENT: Your MetaMask wallet has been compromised. To recover your funds, enter your 12-word seed phrase at metamask-recovery-portal.com immediately. Failure to act within 2 hours will result in permanent loss of access.",
-  'founder':"This is Vitalik Buterin. I am personally distributing ETH to early Ethereum supporters as a thank you for your loyalty. Send 0.5 ETH to this address and receive 5 ETH back within 10 minutes.",
-  'legit-tx':"Your Ethereum transaction 0x8f3b2a1c has been confirmed after 12 block confirmations. Gas used: 21,000. Transaction fee paid: 0.002 ETH. View on Etherscan for full details.",
-  'legit-stake':"Your staking rewards of 0.0042 ETH have been added to your validator balance. Current estimated annual percentage rate: 4.2%. Next reward expected in approximately 6.5 minutes.",
-  'borderline':"We have been receiving complaints against your account. Please find the details below in PDF for your kind attention. Open the attached file. Thanks and best regards, Manager - Human Resources.",
+const EX = {
+  airdrop:    "Congratulations! You have been selected to receive a free airdrop of 500 ETH. To claim your tokens, connect your wallet at metamask-airdrop-claim.com and approve the transaction within 24 hours or your allocation will be lost.",
+  seed:       "URGENT: Your MetaMask wallet has been compromised. To recover your funds, enter your 12-word seed phrase at metamask-recovery-portal.com immediately. Failure to act within 2 hours will result in permanent loss of access.",
+  founder:    "This is Vitalik Buterin. I am personally distributing ETH to early Ethereum supporters as a thank you for your loyalty. Send 0.5 ETH to this address and receive 5 ETH back within 10 minutes.",
+  'legit-tx': "Your Ethereum transaction 0x8f3b2a1c has been confirmed after 12 block confirmations. Gas used: 21,000. Transaction fee paid: 0.002 ETH. View on Etherscan for full details.",
+  'legit-stake': "Your staking rewards of 0.0042 ETH have been added to your validator balance. Current estimated annual percentage rate: 4.2%. Next reward expected in approximately 6.5 minutes.",
+  borderline: "We have been receiving complaints against your account. Please find the details below in PDF for your kind attention. Open the attached file. Thanks and best regards, Manager, Human Resources.",
 };
 
-let total=0,threats=0,safes=0,agreements=0,feedRunning=false,feedIndex=0,modelsReady=false,feedTimeout=null;
+let running=false, idx=0, ready=false, timer=null;
 
-function updateStats(){
-  document.getElementById('stat-total').textContent=total;
-  document.getElementById('stat-threats').textContent=threats;
-  document.getElementById('stat-safe').textContent=safes;
-  const agreeRate=total>0?Math.round((agreements/total)*100):0;
-  document.getElementById('stat-agree').textContent=agreeRate+'%';
-}
-
-function getTime(){return new Date().toLocaleTimeString('en-GB',{hour12:false});}
-
-async function pollStatus(){
-  try{
-    const res=await fetch(`${API_BASE}/status`);
-    const data=await res.json();
-    document.getElementById('loading-msg').textContent=data.message;
-    if(data.status==='ready'){
-      modelsReady=true;
-      document.getElementById('status-dot').classList.add('ready');
-      document.getElementById('model-status-text').textContent='All 3 models ready';
-      document.getElementById('model-status-text').classList.add('ready');
-      document.getElementById('classify-btn').disabled=false;
-      const overlay=document.getElementById('feed-loading');
-      if(overlay)overlay.remove();
-      feedRunning=true;
-      document.getElementById('btn-feed').textContent='⏸ Pause Feed';
-      document.getElementById('btn-feed').classList.add('active');
+async function pollStatus() {
+  try {
+    const d = await (await fetch(`${API}/status`)).json();
+    document.getElementById('loading-msg').textContent = d.message;
+    if (d.status === 'ready') {
+      ready = true;
+      document.getElementById('run-btn').disabled = false;
+      document.getElementById('feed-loading').remove();
+      running = true;
       scheduleFeed();
-    } else if(data.status==='error'){
-      document.getElementById('loading-msg').textContent='Error: '+data.message;
+    } else if (d.status === 'error') {
+      document.getElementById('loading-msg').textContent = 'Error: ' + d.message;
     } else {
-      setTimeout(pollStatus,1500);
+      setTimeout(pollStatus, 1500);
     }
-  }catch(e){
-    document.getElementById('loading-msg').textContent='Cannot reach server. Is app.py running?';
-    setTimeout(pollStatus,3000);
+  } catch(e) {
+    document.getElementById('loading-msg').textContent = 'Cannot connect to server.';
+    setTimeout(pollStatus, 3000);
   }
 }
 
-async function callClassify(text){
-  const res=await fetch(`${API_BASE}/classify`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
-  if(!res.ok)throw new Error(`Server error: ${res.status}`);
-  return await res.json();
+async function classify(text) {
+  const r = await fetch(`${API}/classify`, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({text})});
+  if (!r.ok) throw new Error('Server error ' + r.status);
+  return r.json();
 }
 
-function getCardClass(data){
-  const tp=data.tfidf.prediction===1;
-  const bp=data.distilbert.prediction===1;
-  const ap=data.adapted.prediction===1;
-  const votes=tp+bp+ap;
-  if(votes===3)return 'danger';
-  if(votes>=1)return 'warning';
-  return 'safe';
+function getClass(d) {
+  const v = d.tfidf.prediction + d.distilbert.prediction + d.adapted.prediction;
+  return v >= 2 ? 'ph' : v >= 1 ? 'sp' : 'le';
 }
 
-function getCardBadge(cardClass,data){
-  const votes=data.tfidf.prediction+data.distilbert.prediction+data.adapted.prediction;
-  if(cardClass==='danger')return['badge-danger','⚠ PHISHING (3/3)'];
-  if(cardClass==='warning')return['badge-warning',`⚡ SPLIT (${votes}/3 models)`];
-  return['badge-safe','✓ LEGITIMATE (3/3)'];
-}
-
-function addToFeed(source,data){
-  const feed=document.getElementById('feed-list');
-  const cardClass=getCardClass(data);
-  const [badgeClass,badgeText]=getCardBadge(cardClass,data);
-
-  const tfidfPct=Math.round(data.tfidf.probability*100);
-  const bertPct=Math.round(data.distilbert.probability*100);
-  const adaptedPct=Math.round(data.adapted.probability*100);
-
-  const tBar=data.tfidf.probability>=0.5?'danger':'safe';
-  const bBar=data.distilbert.probability>=0.5?'danger':'safe';
-  const aBar=data.adapted.probability>=0.5?'danger':'safe';
-
-  const card=document.createElement('div');
-  card.className=`msg-card ${cardClass}`;
-  card.innerHTML=`
-    <div class="msg-top">
-      <span class="msg-source">${source}</span>
-      <span class="msg-badge ${badgeClass}">${badgeText}</span>
+function addCard(src, d) {
+  const feed = document.getElementById('feed');
+  const cls = getClass(d);
+  const v = d.tfidf.prediction + d.distilbert.prediction + d.adapted.prediction;
+  const vt = cls==='ph' ? `Phishing (${v}/3)` : cls==='sp' ? `Split (${v}/3)` : 'Legitimate (3/3)';
+  const tp = Math.round(d.tfidf.probability*100);
+  const bp = Math.round(d.distilbert.probability*100);
+  const ap = Math.round(d.adapted.probability*100);
+  const c = document.createElement('div');
+  c.className = 'card ' + cls;
+  c.innerHTML = `
+    <div class="ctop"><span class="csrc">${src}</span><span class="cverd ${cls}">${vt}</span></div>
+    <div class="ctext">${(d.text||'').substring(0,180)}${(d.text||'').length>180?'...':''}</div>
+    <div class="cmodels">
+      <div class="cm ${d.tfidf.prediction===1?'p':'l'}"><div class="cmn">TF-IDF + LR</div><div class="cml ${d.tfidf.prediction===1?'p':'l'}">${d.tfidf.label}</div><div class="cmpc ${d.tfidf.prediction===1?'p':'l'}">${tp}% phishing</div></div>
+      <div class="cm ${d.distilbert.prediction===1?'p':'l'}"><div class="cmn">DistilBERT</div><div class="cml ${d.distilbert.prediction===1?'p':'l'}">${d.distilbert.label}</div><div class="cmpc ${d.distilbert.prediction===1?'p':'l'}">${bp}% phishing</div></div>
+      <div class="cm ${d.adapted.prediction===1?'p':'l'}"><div class="cmn">Adapted</div><div class="cml ${d.adapted.prediction===1?'p':'l'}">${d.adapted.label}</div><div class="cmpc ${d.adapted.prediction===1?'p':'l'}">${ap}% phishing</div></div>
     </div>
-    <div class="msg-text">${(data.text||'').substring(0,150)}${(data.text||'').length>150?'…':''}</div>
-    <div class="model-compare">
-      <div class="model-result">
-        <div class="model-result-title tfidf">TF-IDF + LR</div>
-        <div class="model-result-label ${data.tfidf.prediction===1?'phishing':'legit'}">${data.tfidf.label}</div>
-        <div class="model-result-conf"><div class="conf-mini"><div class="conf-mini-fill ${tBar}" style="width:${tfidfPct}%"></div></div>${tfidfPct}%</div>
-      </div>
-      <div class="model-result">
-        <div class="model-result-title bert">DistilBERT</div>
-        <div class="model-result-label ${data.distilbert.prediction===1?'phishing':'legit'}">${data.distilbert.label}</div>
-        <div class="model-result-conf"><div class="conf-mini"><div class="conf-mini-fill ${bBar}" style="width:${bertPct}%"></div></div>${bertPct}%</div>
-      </div>
-      <div class="model-result">
-        <div class="model-result-title adapted">Adapted</div>
-        <div class="model-result-label ${data.adapted.prediction===1?'phishing':'legit'}">${data.adapted.label}</div>
-        <div class="model-result-conf"><div class="conf-mini"><div class="conf-mini-fill ${aBar}" style="width:${adaptedPct}%"></div></div>${adaptedPct}%</div>
-      </div>
-    </div>
-    <div class="msg-footer">
-      <span class="msg-attack">${data.attack_type?'Attack: '+data.attack_type:''}</span>
-      <span>${getTime()} · ${data.inference_ms}ms</span>
-    </div>`;
-
-  feed.insertBefore(card,feed.firstChild);
-  while(feed.children.length>20)feed.removeChild(feed.lastChild);
-
-  total++;
-  const allAgree=data.tfidf.prediction===data.distilbert.prediction&&data.distilbert.prediction===data.adapted.prediction;
-  if(allAgree)agreements++;
-  if(cardClass==='danger'||cardClass==='warning'){threats++;addAlert(source,data,cardClass);}
-  else{safes++;}
-  updateStats();
+`;
+  feed.insertBefore(c, feed.firstChild);
+  while (feed.children.length > 20) feed.removeChild(feed.lastChild);
 }
 
-function addAlert(source,data,cardClass){
-  const alertList=document.getElementById('alert-list');
-  const placeholder=alertList.querySelector('div[style]');
-  if(placeholder)placeholder.remove();
-
-  const tTag=`<span class="alert-model-tag ${data.tfidf.prediction===1?'tag-phish-t':'tag-safe-t'}">TF-IDF: ${data.tfidf.label}</span>`;
-  const bTag=`<span class="alert-model-tag ${data.distilbert.prediction===1?'tag-phish-b':'tag-safe-b'}">BERT: ${data.distilbert.label}</span>`;
-  const aTag=`<span class="alert-model-tag ${data.adapted.prediction===1?'tag-phish-a':'tag-safe-a'}">Adapted: ${data.adapted.label}</span>`;
-
-  const item=document.createElement('div');
-  item.className=`alert-item${cardClass==='warning'?' warn':''}`;
-  item.innerHTML=`
-    <div class="alert-top">
-      <span class="alert-type">${data.attack_type||'Social Engineering'}</span>
-      <span class="alert-time">${getTime()}</span>
-    </div>
-    <div class="alert-msg">${(data.text||'').substring(0,80)}…</div>
-    <div class="alert-models">${tTag}${bTag}${aTag}</div>`;
-  alertList.insertBefore(item,alertList.firstChild);
-  while(alertList.children.length>12)alertList.removeChild(alertList.lastChild);
+async function feedStep() {
+  if (!running || !ready) return;
+  const msg = FEED[idx % FEED.length]; idx++;
+  try { const d = await classify(msg.text); addCard(msg.src, d); } catch(e) { console.error(e); }
+  if (running) scheduleFeed();
 }
 
-async function runFeedItem(){
-  if(!feedRunning||!modelsReady)return;
-  const msg=FEED_MESSAGES[feedIndex%FEED_MESSAGES.length];
-  feedIndex++;
-  try{const data=await callClassify(msg.text);addToFeed(msg.source,data);}
-  catch(e){console.error('Feed error:',e);}
-  if(feedRunning)scheduleFeed();
+function scheduleFeed() { timer = setTimeout(feedStep, 2600 + Math.random()*2000); }
+
+function toggleFeed() {
+  running = !running;
+  const b = document.getElementById('btn-feed');
+  if (running) { b.textContent='Pause'; b.classList.add('on'); scheduleFeed(); }
+  else { b.textContent='Resume'; b.classList.remove('on'); if(timer) clearTimeout(timer); }
 }
 
-function scheduleFeed(){feedTimeout=setTimeout(runFeedItem,2500+Math.random()*2000);}
-
-function toggleFeed(){
-  feedRunning=!feedRunning;
-  const btn=document.getElementById('btn-feed');
-  if(feedRunning){btn.textContent='⏸ Pause Feed';btn.classList.add('active');scheduleFeed();}
-  else{btn.textContent='▶ Resume Feed';btn.classList.remove('active');if(feedTimeout)clearTimeout(feedTimeout);}
+async function runManual() {
+  if (!ready) return;
+  const box = document.getElementById('input-box');
+  const btn = document.getElementById('run-btn');
+  const text = box.value.trim();
+  if (!text) return;
+  btn.disabled=true; btn.textContent='Running...';
+  try { const d = await classify(text); addCard('Manual input', d); box.value=''; }
+  catch(e) { alert('Error: '+e.message); }
+  finally { btn.disabled=false; btn.textContent='Run'; }
 }
 
-function clearFeed(){document.getElementById('feed-list').innerHTML='';}
+function fill(k) { document.getElementById('input-box').value = EX[k]||''; document.getElementById('input-box').focus(); }
 
-async function classifyManual(){
-  if(!modelsReady)return;
-  const input=document.getElementById('manual-input');
-  const btn=document.getElementById('classify-btn');
-  const text=input.value.trim();
-  if(!text)return;
-  btn.disabled=true;btn.textContent='Running...';
-  try{const data=await callClassify(text);addToFeed('Manual Input',data);input.value='';}
-  catch(e){alert('Classification failed: '+e.message);}
-  finally{btn.disabled=false;btn.textContent='CLASSIFY →';}
-}
-
-function fillHint(key){document.getElementById('manual-input').value=HINTS[key]||'';document.getElementById('manual-input').focus();}
-
-setInterval(()=>{document.getElementById('clock').textContent=getTime();},1000);
-
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('manual-input').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.ctrlKey)classifyManual();});
-  document.getElementById('clock').textContent=getTime();
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('input-box').addEventListener('keydown', e => { if(e.key==='Enter'&&e.ctrlKey) runManual(); });
   pollStatus();
 });
 </script>

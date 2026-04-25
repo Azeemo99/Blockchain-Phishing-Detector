@@ -1,14 +1,14 @@
 """
-ZPhisher — Blockchain Social Engineering Detection Demo
+CryptoGuard — Blockchain Social Engineering Detection Demo
 Flask backend serving THREE classifiers:
   1. TF-IDF + Logistic Regression (baseline)
   2. DistilBERT (general — trained on email corpora)
   3. DistilBERT (domain-adapted — fine-tuned on blockchain communications)
-CMP-6013Y Final Year Project · Azeem Abdul-Rahim
 """
 
 import os
 import re
+import sys
 import time
 import threading
 import numpy as np
@@ -16,9 +16,11 @@ import pandas as pd
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 
+sys.stdout.reconfigure(encoding='utf-8')
+
 BASE_DIR         = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR        = os.path.join(BASE_DIR, 'model_checkpoint')
-ADAPTED_DIR      = os.path.join(BASE_DIR, 'model_checkpoint_adapted')
+ADAPTED_DIR      = os.path.join(BASE_DIR, 'model_checkpoint_adapted_final')
 TRAIN_CSV        = os.path.join(BASE_DIR, 'data', 'processed', 'train.csv')
 
 app = Flask(__name__)
@@ -112,16 +114,6 @@ def run_tfidf(text):
         "confidence_pct": round(prob * 100, 1)
     }
 
-def detect_attack_type(text):
-    t = text.lower()
-    if re.search(r'seed phrase|recovery phrase|private key', t): return "Credential Harvesting"
-    if re.search(r'airdrop', t): return "Fake Airdrop"
-    if re.search(r'giveaway|sending back|double.*back', t): return "Giveaway Fraud"
-    if re.search(r'support|help desk|customer service', t): return "Support Impersonation"
-    if re.search(r'verify|verification|kyc', t): return "Verification Scam"
-    if re.search(r'nft|whitelist', t): return "NFT Scam"
-    if re.search(r'invest|return|profit|yield', t): return "Investment Fraud"
-    return "Social Engineering"
 
 @app.route('/')
 def index():
@@ -149,21 +141,16 @@ def classify():
 
     elapsed = round((time.time() - t0) * 1000, 1)
 
-    attack_type = None
-    if any(r["prediction"] == 1 for r in [tfidf_result, bert_result, adapted_result]):
-        attack_type = detect_attack_type(text)
-
     return jsonify({
         "text":          text[:200],
         "tfidf":         tfidf_result,
         "distilbert":    bert_result,
         "adapted":       adapted_result,
-        "attack_type":   attack_type,
         "inference_ms":  elapsed
     })
 
 if __name__ == '__main__':
-    print("Starting ZPhisher demo server (3-model mode)...")
+    print("Starting CryptoGuard demo server (3-model mode)...")
     thread = threading.Thread(target=load_models, daemon=True)
     thread.start()
     print("Server starting at http://localhost:5000")
