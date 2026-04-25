@@ -2,7 +2,7 @@ Blockchain Social Engineering Detection
 
 Browser opens automatically at http://localhost:5000
 
-WHAT THE DEMO SHOWS
+CRYPTOGUARD
 --------------------
 CryptoGuard is a simulation of a real-time social engineering detection system
 that classifies blockchain communications using THREE models:
