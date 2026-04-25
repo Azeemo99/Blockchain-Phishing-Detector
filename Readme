@@ -1,11 +1,10 @@
 Blockchain Social Engineering Detection
 
 Browser opens automatically at http://localhost:5000
-Green dot in top-left = all 3 models ready
 
 WHAT THE DEMO SHOWS
 --------------------
-ZPhisher is a real-time social engineering detection system
+CryptoGuard is a simulation of a real-time social engineering detection system
 that classifies blockchain communications using THREE models:
 
   - TF-IDF + Logistic Regression (baseline)
@@ -21,7 +20,7 @@ through all three models instantly (Ctrl+Enter to submit).
 
 HINT PILLS
 ----------
-Click the coloured pills above the input box to load
+Click the pills below the input box to load
 pre-written examples covering different attack types:
   - Fake airdrop        - Seed phrase scam
   - Founder impersonation  - Legitimate transaction
@@ -32,6 +31,4 @@ TROUBLESHOOTING
 ---------------
 - Browser shows "Cannot reach server": wait 30 more seconds
   for models to load, then refresh
-- Red dot in header: models still loading, wait
-- Green dot but feed not starting: click Resume Feed button
 - Port 5000 already in use: restart the batch file
